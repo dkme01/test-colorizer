@@ -38,10 +38,6 @@ export default function Home() {
   const getModelInfo = async () => {
     console.log("getModelInfo");
     const materialsFromModel = await p3d.current?.listMaterials();
-    const objectsFromModel = await p3d.current?.listObjects();
-
-    console.log(materialsFromModel);
-    console.log(objectsFromModel);
 
     if (materialsFromModel.length > 0) {
       materials.current = materialsFromModel;
@@ -51,18 +47,10 @@ export default function Home() {
     }
   };
 
-  const getClickInfo = (aux) => {
-    const materialSelectedIndex = materialsList.findIndex((material) => material.name === aux?.material?.name);
-    console.log(materialSelectedIndex);
-    setPanelExpanded(materialSelectedIndex);
-  };
-
   useEffect(() => {
     p3d.current = new P3dEmbedApi(document.getElementById("p3d-embed"), {
       onload: getModelInfo,
-      onclick: getClickInfo,
     });
-    console.log("p3d", p3d);
 
     p3d.current?.setAllowCameraReset("if-outside");
 
