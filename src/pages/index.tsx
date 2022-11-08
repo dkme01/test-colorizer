@@ -47,7 +47,7 @@ export default function Home() {
     if (materialsFromModel.length > 0) {
       materials.current = materialsFromModel;
       setMaterialsList(() => materials.current);
-      setColors(() => materials.current.map((material) => ({ hex: material.baseColor })));
+      setColors(() => materials.current.map((material: any) => ({ hex: material.baseColor })));
     }
     if (variantsFromModel.length > 0) {
       setVariants(variantsFromModel);
@@ -63,10 +63,10 @@ export default function Home() {
     p3d.current?.setAllowCameraRecenter(false);
   }, [p3d]);
 
-  const handleChangeColor = (color, colorIndex: number) => {
+  const handleChangeColor = (color: any, colorIndex: number) => {
     if (materials.current) {
-      setColors((oldColors) =>
-        oldColors.map((oldColor, oldIndex) => {
+      setColors((oldColors: any) =>
+        oldColors.map((oldColor: any, oldIndex: any) => {
           if (oldIndex === colorIndex) {
             oldColor = color;
           }
@@ -78,8 +78,8 @@ export default function Home() {
   };
 
   const handleChangeMaterialValue = (materialValue: number, materialName: string, materialIndex: number) => {
-    setMaterialsList((oldMaterials) =>
-      oldMaterials.map((material, index) => {
+    setMaterialsList((oldMaterials: any) =>
+      oldMaterials.map((material: any, index: any) => {
         if (index === materialIndex) {
           material[materialName] = materialValue / 1000;
         }
@@ -89,9 +89,9 @@ export default function Home() {
     materials.current[materialIndex][materialName] = materialValue / 1000;
   };
 
-  const handleChangeMetalness = (checked: boolea, materialIndex: number) => {
-    setMaterialsList((oldMaterials) =>
-      oldMaterials.map((material, index) => {
+  const handleChangeMetalness = (checked: boolean, materialIndex: number) => {
+    setMaterialsList((oldMaterials: any) =>
+      oldMaterials.map((material: any, index: any) => {
         if (index === materialIndex) {
           material.metalness = checked ? 1 : 0;
         }
@@ -131,7 +131,7 @@ export default function Home() {
               <Button sx={{ mr: 1 }} variant="contained">
                 Base
               </Button>
-              {variants.map((variant) => (
+              {variants.map((variant: any) => (
                 <Button variant="contained" key={variant.name}>
                   {variant.name}
                 </Button>
