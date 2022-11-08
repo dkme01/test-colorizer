@@ -51,8 +51,17 @@ export default function Home() {
     }
   };
 
+  const getClickInfo = (aux) => {
+    const materialSelectedIndex = materialsList.findIndex((material) => material.name === aux?.material?.name);
+    console.log(materialSelectedIndex);
+    setPanelExpanded(materialSelectedIndex);
+  };
+
   useEffect(() => {
-    p3d.current = new P3dEmbedApi(document.getElementById("p3d-embed"), { onload: getModelInfo });
+    p3d.current = new P3dEmbedApi(document.getElementById("p3d-embed"), {
+      onload: getModelInfo,
+      onclick: getClickInfo,
+    });
     console.log("p3d", p3d);
 
     p3d.current?.setAllowCameraReset("if-outside");
@@ -139,7 +148,7 @@ export default function Home() {
               ></iframe>
             </Grid>
           </Grid>
-          <Box sx={{ width: viewPort ? "20vw" : "100%" }}>
+          <Box sx={{ width: viewPort ? "30vw" : "100%", height: viewPort ? "75vh" : "100%", overflow: "auto" }}>
             {materialsList.length > 0 ? (
               materialsList?.map((material: any, index: number) => (
                 <Box margin={1} key={`${material.name}_${index + 1}`}>
