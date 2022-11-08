@@ -144,8 +144,8 @@ export default function Home() {
             <Grid item xs={12} sx={{ maxHeight: "70vh", height: "70vh" }}>
               <iframe
                 frameBorder="0"
-                src="https://p3d.in/e/sUrr1+api+load+controls,variants,hotspots-hidden+spin"
-                // src="https://p3d.in/e/xXis0+api+load+controls,variants,hotspots-hidden+spin"
+                // src="https://p3d.in/e/sUrr1+api+load+controls,variants,hotspots-hidden+spin"
+                src="https://p3d.in/e/xXis0+api+load+controls,variants,hotspots-hidden+spin"
                 id="p3d-embed"
               ></iframe>
             </Grid>
