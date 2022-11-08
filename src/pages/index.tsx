@@ -139,7 +139,7 @@ export default function Home() {
           </Toolbar>
         </AppBar>
         <Grid marginTop="8vh" spacing={2} container display="flex" direction="row">
-          <Grid container item xs={12} md={8}>
+          <Grid container item xs={12} md={7}>
             <Grid item xs={12} sx={{ maxHeight: "70vh", height: "70vh" }}>
               <iframe
                 frameBorder="0"
@@ -148,7 +148,7 @@ export default function Home() {
               ></iframe>
             </Grid>
           </Grid>
-          <Box sx={{ width: viewPort ? "30vw" : "100%", height: viewPort ? "75vh" : "100%", overflow: "auto" }}>
+          <Box sx={{ width: viewPort ? "25vw" : "100%", height: viewPort ? "75vh" : "100%", overflow: "auto" }}>
             {materialsList.length > 0 ? (
               materialsList?.map((material: any, index: number) => (
                 <Box margin={1} key={`${material.name}_${index + 1}`}>
