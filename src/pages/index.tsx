@@ -38,6 +38,7 @@ export default function Home() {
   const getModelInfo = async () => {
     console.log("getModelInfo");
     const materialsFromModel = await p3d.current?.listMaterials();
+    const camera = await p3d.current?.getCamera();
 
     if (materialsFromModel.length > 0) {
       materials.current = materialsFromModel;
@@ -131,7 +132,7 @@ export default function Home() {
             <Grid item xs={12} sx={{ maxHeight: "70vh", height: "70vh" }}>
               <iframe
                 frameBorder="0"
-                src="https://p3d.in/e/xXis0+api+load+shading,dl,share,spin,link,variants-hidden+spin"
+                src="https://p3d.in/e/xXis0+api+spin+load+shading,dl,share,spin,link,variants-hidden"
                 id="p3d-embed"
               ></iframe>
             </Grid>
