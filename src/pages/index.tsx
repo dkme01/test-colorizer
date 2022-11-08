@@ -28,6 +28,7 @@ import InputColor from "react-input-color";
 export default function Home() {
   const navItems = ["Home", "About", "Contact"];
   const [colors, setColors] = useState<any>([]);
+  const [glowColor, setGlowColor] = useState<any>([]);
   const [panelExpanded, setPanelExpanded] = useState<any>(0);
   const [materialsList, setMaterialsList] = useState<any>([]);
   const [variants, setVariants] = useState<any>([]);
@@ -48,6 +49,7 @@ export default function Home() {
       materials.current = materialsFromModel;
       setMaterialsList(() => materials.current);
       setColors(() => materials.current.map((material: any) => ({ hex: material.baseColor })));
+      setGlowColor(() => materials.current.map((material: any) => ({ hex: material.glowColor })));
     }
     if (variantsFromModel.length > 0) {
       setVariants(variantsFromModel);
@@ -74,6 +76,20 @@ export default function Home() {
         })
       );
       materials.current[colorIndex].baseColor = color.hex.replace("#", "");
+    } else return;
+  };
+
+  const handleChangeGlow = (color: any, colorIndex: number) => {
+    if (materials.current) {
+      setGlowColor((oldColors: any) =>
+        oldColors.map((oldColor: any, oldIndex: any) => {
+          if (oldIndex === colorIndex) {
+            oldColor = color;
+          }
+          return oldColor;
+        })
+      );
+      materials.current[colorIndex].glowColor = color.hex.replace("#", "");
     } else return;
   };
 
@@ -263,13 +279,23 @@ export default function Home() {
                           <Tooltip title="Capacidade de luminosa do material">
                             <Typography variant="body2">Emissivo</Typography>
                           </Tooltip>
-                          <Slider
-                            valueLabelFormat={(label) => label / 1000}
-                            valueLabelDisplay="auto"
-                            max={1000}
-                            onChange={(_, value) => handleChangeMaterialValue(Number(value), "glowFactor", index)}
-                            value={material.glowFactor * 1000}
+                          <MaterialPicker
+                            color={glowColor[index]}
+                            onChange={(color) => handleChangeGlow(color, index)}
+                            disableAlpha
                           />
+                          <Box sx={{ mt: 2 }}>
+                            <Tooltip title="Fator da emissividade do material">
+                              <Typography variant="body2">Fator emissivo</Typography>
+                            </Tooltip>
+                            <Slider
+                              valueLabelFormat={(label) => label / 1000}
+                              valueLabelDisplay="auto"
+                              max={1000}
+                              onChange={(_, value) => handleChangeMaterialValue(Number(value), "glowFactor", index)}
+                              value={material.glowFactor * 1000}
+                            />
+                          </Box>
                         </Box>
                       </Box>
                     </AccordionDetails>
