@@ -17,6 +17,7 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
@@ -26,23 +27,20 @@ import { ChromePicker as MaterialPicker, Color, ColorResult, RGBColor } from "re
 import InputColor from "react-input-color";
 
 export default function Home() {
-  const navItems = ["Home", "About", "Contact"];
+  const viewPort = useMediaQuery("(min-width:900px)");
   const [colors, setColors] = useState<any>([]);
   const [glowColor, setGlowColor] = useState<any>([]);
   const [panelExpanded, setPanelExpanded] = useState<any>(0);
   const [materialsList, setMaterialsList] = useState<any>([]);
-  const [variants, setVariants] = useState<any>([]);
   let p3d: any = useRef(null);
   let materials: any = useRef(null);
 
   const getModelInfo = async () => {
     console.log("getModelInfo");
     const materialsFromModel = await p3d.current?.listMaterials();
-    const variantsFromModel = await p3d.current?.listVariants();
     const objectsFromModel = await p3d.current?.listObjects();
 
     console.log(materialsFromModel);
-    console.log(variantsFromModel);
     console.log(objectsFromModel);
 
     if (materialsFromModel.length > 0) {
@@ -50,9 +48,6 @@ export default function Home() {
       setMaterialsList(() => materials.current);
       setColors(() => materials.current.map((material: any) => ({ hex: material.baseColor })));
       setGlowColor(() => materials.current.map((material: any) => ({ hex: material.glowColor })));
-    }
-    if (variantsFromModel.length > 0) {
-      setVariants(variantsFromModel);
     }
   };
 
@@ -132,41 +127,19 @@ export default function Home() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}>
               3D Prototype
             </Typography>
-            <Box sx={{ display: { xs: "none", sm: "block" } }}>
-              {navItems.map((item) => (
-                <Button key={item} sx={{ color: "#fff" }}>
-                  {item}
-                </Button>
-              ))}
-            </Box>
           </Toolbar>
         </AppBar>
-        <Box marginTop="8vh">
-          {variants.length > 0 && (
-            <Box marginBottom={1}>
-              <Button sx={{ mr: 1 }} variant="contained">
-                Base
-              </Button>
-              {variants.map((variant: any) => (
-                <Button variant="contained" key={variant.name}>
-                  {variant.name}
-                </Button>
-              ))}
-            </Box>
-          )}
-        </Box>
-        <Grid spacing={2} container display="flex" direction="row">
+        <Grid marginTop="8vh" spacing={2} container display="flex" direction="row">
           <Grid container item xs={12} md={8}>
             <Grid item xs={12} sx={{ maxHeight: "70vh", height: "70vh" }}>
               <iframe
                 frameBorder="0"
-                // src="https://p3d.in/e/sUrr1+api+load+controls,variants,hotspots-hidden+spin"
-                src="https://p3d.in/e/xXis0+api+load+controls,variants,hotspots-hidden+spin"
+                src="https://p3d.in/e/xXis0+api+load+variants-hidden+spin"
                 id="p3d-embed"
               ></iframe>
             </Grid>
           </Grid>
-          <Box /* container spacing={2} item xs={12} md={4} */ /* direction="column" */ sx={{ width: "20vw" }}>
+          <Box sx={{ width: viewPort ? "20vw" : "100%" }}>
             {materialsList.length > 0 ? (
               materialsList?.map((material: any, index: number) => (
                 <Box margin={1} key={`${material.name}_${index + 1}`}>
