@@ -40,12 +40,28 @@ export default function Home() {
     const materialsFromModel = await p3d.current?.listMaterials();
     const camera = await p3d.current?.getCamera();
 
+    console.log(materialsFromModel);
+
     if (materialsFromModel.length > 0) {
       materials.current = materialsFromModel;
       setMaterialsList(() => materials.current);
       setColors(() => materials.current.map((material: any) => ({ hex: material.baseColor })));
       setGlowColor(() => materials.current.map((material: any) => ({ hex: material.glowColor })));
     }
+  };
+
+  const setNewTexture = async () => {
+    const texture =
+      "https://gruppoconcorde-cdn.thron.com/delivery/public/image/gruppoconcorde/c39086bc-8106-46b2-8fa4-416f7c18f558/sccw3m/std/1500x0/AtlasConcordeSolution_Codec_Anthracite_60x60_Rectified_A3A8_2.jpg?format=WEBP";
+    const textureBlob = new Blob([texture]);
+
+    materials.current[0].bumpTexture = await textureBlob.text();
+  };
+
+  const resetTexture = () => {
+    const texture = "https://p3d.in/static/uploads/136475/tex-a7a32628230.webp";
+
+    materials.current[0].bumpTexture = texture;
   };
 
   useEffect(() => {
@@ -127,7 +143,11 @@ export default function Home() {
             </Typography>
           </Toolbar>
         </AppBar>
-        <Grid marginTop="8vh" spacing={2} container display="flex" direction="row">
+        <Box marginTop="8vh">
+          <Button onClick={() => setNewTexture()}>setNewTexture</Button>
+          <Button onClick={() => resetTexture()}>resetTexture</Button>
+        </Box>
+        <Grid /* marginTop="8vh" */ spacing={2} container display="flex" direction="row">
           <Grid container item xs={12} md={7}>
             <Grid item xs={12} sx={{ maxHeight: "70vh", height: "70vh" }}>
               <iframe
@@ -185,7 +205,7 @@ export default function Home() {
                           </Tooltip>
                           <Checkbox
                             sx={{ py: 0 }}
-                            checked={material.metalness}
+                            checked={!!material.metalness}
                             onChange={(_, checked) => handleChangeMetalness(checked, index)}
                           />
                           {/* <Slider
