@@ -129,7 +129,7 @@ export default function Home() {
     setPanelExpanded(panelIndex === panelExpanded ? -1 : panelIndex);
   };
 
-  const handleChange3DValue = (e) => {
+  const handleChange3DValue = (e: any) => {
     setNew3DModel(e.target.value);
     localStorage.setItem("3d-model-link", e.target.value);
 
