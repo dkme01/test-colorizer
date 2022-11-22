@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Container,
   FormControlLabel,
   Grid,
@@ -25,54 +26,64 @@ import P3dEmbedApi from "../utils/external-p3d";
 import TWEEN from "../utils/external-tween";
 import { ChromePicker as MaterialPicker, Color, ColorResult, RGBColor } from "react-color";
 import InputColor from "react-input-color";
+import { useRouter } from "next/router";
+
+function useChecksum(value: any) {
+  const [checksum, setChecksum] = useState(0);
+
+  useEffect(() => {
+    setChecksum((checksum) => checksum + 1);
+  }, [value]);
+
+  return checksum;
+}
 
 export default function Home() {
+  const router = useRouter();
   const viewPort = useMediaQuery("(min-width:900px)");
+  const [loading, setLoading] = useState<boolean>(false);
   const [colors, setColors] = useState<any>([]);
   const [glowColor, setGlowColor] = useState<any>([]);
   const [panelExpanded, setPanelExpanded] = useState<any>(0);
+  const [new3DModel, setNew3DModel] = useState<any>("");
   const [materialsList, setMaterialsList] = useState<any>([]);
+
   let p3d: any = useRef(null);
   let materials: any = useRef(null);
 
-  const getModelInfo = async () => {
-    console.log("getModelInfo");
-    const materialsFromModel = await p3d.current?.listMaterials();
-    const camera = await p3d.current?.getCamera();
+  useEffect(() => {
+    const modelFromStorage = localStorage.getItem("3d-model-link");
 
-    console.log(materialsFromModel);
+    if (modelFromStorage !== null) setNew3DModel(modelFromStorage);
+  }, []);
+
+  const getModelInfo = async () => {
+    const materialsFromModel = await p3d.current?.listMaterials();
+
+    setLoading(true);
+
+    console.log("getModelInfo", materialsFromModel);
 
     if (materialsFromModel.length > 0) {
       materials.current = materialsFromModel;
-      setMaterialsList(() => materials.current);
+      setMaterialsList(materialsFromModel);
       setColors(() => materials.current.map((material: any) => ({ hex: material.baseColor })));
       setGlowColor(() => materials.current.map((material: any) => ({ hex: material.glowColor })));
+      setLoading(false);
     }
   };
 
-  const setNewTexture = async () => {
-    const texture =
-      "https://gruppoconcorde-cdn.thron.com/delivery/public/image/gruppoconcorde/c39086bc-8106-46b2-8fa4-416f7c18f558/sccw3m/std/1500x0/AtlasConcordeSolution_Codec_Anthracite_60x60_Rectified_A3A8_2.jpg?format=WEBP";
-    const textureBlob = new Blob([texture]);
-
-    materials.current[0].bumpTexture = await textureBlob.text();
-  };
-
-  const resetTexture = () => {
-    const texture = "https://p3d.in/static/uploads/136475/tex-a7a32628230.webp";
-
-    materials.current[0].bumpTexture = texture;
-  };
-
   useEffect(() => {
+    // if (new3DModel.length > 4) {
     p3d.current = new P3dEmbedApi(document.getElementById("p3d-embed"), {
-      onload: getModelInfo,
+      onready: getModelInfo,
     });
 
     p3d.current?.setAllowCameraReset("if-outside");
 
     p3d.current?.setAllowCameraRecenter(false);
-  }, [p3d]);
+    // }
+  }, [p3d, new3DModel]);
 
   const handleChangeColor = (color: any, colorIndex: number) => {
     if (materials.current) {
@@ -114,20 +125,15 @@ export default function Home() {
     materials.current[materialIndex][materialName] = materialValue / 1000;
   };
 
-  const handleChangeMetalness = (checked: boolean, materialIndex: number) => {
-    setMaterialsList((oldMaterials: any) =>
-      oldMaterials.map((material: any, index: any) => {
-        if (index === materialIndex) {
-          material.metalness = checked ? 1 : 0;
-        }
-        return material;
-      })
-    );
-    materials.current[materialIndex].metalness = checked ? 1 : 0;
-  };
-
   const onChangePanelOpen = (panelIndex: number) => {
     setPanelExpanded(panelIndex === panelExpanded ? -1 : panelIndex);
+  };
+
+  const handleChange3DValue = (e) => {
+    setNew3DModel(e.target.value);
+    localStorage.setItem("3d-model-link", e.target.value);
+
+    setTimeout(() => router.reload(), 500);
   };
 
   return (
@@ -143,18 +149,23 @@ export default function Home() {
             </Typography>
           </Toolbar>
         </AppBar>
-        <Box marginTop="8vh">
-          <Button onClick={() => setNewTexture()}>setNewTexture</Button>
-          <Button onClick={() => resetTexture()}>resetTexture</Button>
+        <Box marginTop="8vh" marginBottom="1vh">
+          <TextField onChange={(e) => handleChange3DValue(e)} value={new3DModel} label="Link do modelo 3D" />
         </Box>
-        <Grid /* marginTop="8vh" */ spacing={2} container display="flex" direction="row">
+        <Grid spacing={2} container display="flex" direction="row">
           <Grid container item xs={12} md={7}>
             <Grid item xs={12} sx={{ maxHeight: "70vh", height: "70vh" }}>
-              <iframe
-                frameBorder="0"
-                src="https://p3d.in/e/xXis0+api+spin+load+shading,dl,share,spin,link,variants-hidden"
-                id="p3d-embed"
-              ></iframe>
+              {loading ? (
+                <CircularProgress />
+              ) : (
+                <iframe
+                  frameBorder="0"
+                  src={`https://p3d.in/e/${
+                    new3DModel.length > 0 ? new3DModel : "Dj8Js"
+                  }+api+load+controls,loader-hidden`}
+                  id="p3d-embed"
+                ></iframe>
+              )}
             </Grid>
           </Grid>
           <Box sx={{ width: viewPort ? "25vw" : "100%", height: viewPort ? "75vh" : "100%", overflow: "auto" }}>
@@ -193,28 +204,17 @@ export default function Home() {
                             />
                           </Box>
                         </Box>
-                        <Box marginTop={1} marginBottom={2} display="flex" flexDirection="row" alignItems="center">
+                        <Box>
                           <Tooltip title="Acabamento metálico do material">
-                            <Typography
-                              sx={{ cursor: "pointer" }}
-                              onClick={() => handleChangeMetalness(!material.metalness, index)}
-                              variant="body2"
-                            >
-                              Metalness
-                            </Typography>
+                            <Typography variant="body2">Metalness</Typography>
                           </Tooltip>
-                          <Checkbox
-                            sx={{ py: 0 }}
-                            checked={!!material.metalness}
-                            onChange={(_, checked) => handleChangeMetalness(checked, index)}
-                          />
-                          {/* <Slider
+                          <Slider
                             valueLabelFormat={(label) => label / 1000}
                             valueLabelDisplay="auto"
                             max={1000}
                             onChange={(_, value) => handleChangeMaterialValue(Number(value), "metalness", index)}
                             value={material.metalness * 1000}
-                          /> */}
+                          />
                         </Box>
                         <Box>
                           <Tooltip title="Aspereza do material">
